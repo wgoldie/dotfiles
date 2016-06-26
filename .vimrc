@@ -13,18 +13,27 @@ Plugin 'chriskempson/base16-vim'
 Plugin 'losingkeys/vim-niji'
 Plugin 'vim-scripts/paredit.vim'
 Plugin 'jgdavey/tslime.vim'
-
+Plugin 'xuhdev/vim-latex-live-preview'
+Plugin 'vim-latex/vim-latex'
+Plugin 'scrooloose/syntastic'
+Plugin 'moll/vim-node'
+Plugin 'pangloss/vim-javascript'
+Plugin 'tpope/vim-sensible'
+Plugin 'elzr/vim-json'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'mxw/vim-jsx'
 call vundle#end()            " required
 
 syntax on
 filetype plugin indent on    " indent file based on type
 
-set shiftwidth=4 tabstop=4 softtabstop=4 expandtab
+set shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 set number
 set showcmd     
 
-colorscheme base16-eighties
-set background=dark
+let base16colorspace=256
+colorscheme base16-bright
+set background=light
 set wildmenu " autocomplete menu in gutter
 set lazyredraw " reduce visual noise and speed up macros
 set showmatch " brace match anim
@@ -33,7 +42,7 @@ set incsearch " highlight while typing
 set hlsearch " highlight matches
 
 "disable search highlight with command
-nnoremap <leader><Space> :nohlsearch<CR> 
+nnoremap <F3> :noh<CR> 
 
 
 "set foldenable
@@ -69,8 +78,6 @@ nnoremap <leader>a :Ag
 augroup configgroup
     autocmd!
     autocmd VimEnter * highlight clear SignColumn
-    autocmd BufWritePre *.php,*.py,*.js,*.txt,*.hs,*.java,*.md
-                \:call <SID>StripTrailingWhitespaces()
     autocmd FileType java setlocal noexpandtab
     autocmd FileType java setlocal list
     autocmd FileType java setlocal listchars=tab:+\ ,eol:-
@@ -91,6 +98,8 @@ augroup configgroup
     autocmd BufEnter *.sh setlocal shiftwidth=2
     autocmd BufEnter *.sh setlocal softtabstop=2
     autocmd FileType lisp,scheme,art setlocal equalprg=scmindent.rkt
+    autocmd FileType tex setl updatetime=1
+    autocmd FileType tex set spelllang=en_us spell
 augroup END
 
 " better swap/backup files
@@ -115,4 +124,23 @@ nmap <C-c><C-c> <Plug>NormalModeSendToTmux
 nmap <C-c>r <Plug>SetTmuxVars
 let g:tslime_ensure_trailing_newlines = 1
 
+" latex
+let g:livepreview_previewer = 'evince'
 
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+let g:syntastic_javascript_checkers = ['standard']
+
+autocmd bufwritepost *.js silent !standard-format -w %
+set autoread
+
+
+let g:jsx_ext_required = 0

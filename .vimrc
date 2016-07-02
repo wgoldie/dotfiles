@@ -22,6 +22,8 @@ Plugin 'tpope/vim-sensible'
 Plugin 'elzr/vim-json'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'mxw/vim-jsx'
+Plugin 'millermedeiros/vim-esformatter'
+Bundle 'ruanyl/vim-fixmyjs'
 call vundle#end()            " required
 
 syntax on
@@ -33,7 +35,7 @@ set showcmd
 
 let base16colorspace=256
 colorscheme base16-bright
-set background=light
+set background=dark
 set wildmenu " autocomplete menu in gutter
 set lazyredraw " reduce visual noise and speed up macros
 set showmatch " brace match anim
@@ -137,10 +139,28 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
-let g:syntastic_javascript_checkers = ['standard']
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 
-autocmd bufwritepost *.js silent !standard-format -w %
-set autoread
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_loc_list_height = 5
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 1
+let g:syntastic_javascript_checkers = ['eslint']
 
+let g:syntastic_error_symbol = '❌'
+let g:syntastic_style_error_symbol = '⁉️'
+let g:syntastic_warning_symbol = '⚠️'
+let g:syntastic_style_warning_symbol = '💩'
+
+highlight link SyntasticErrorSign SignColumn
+highlight link SyntasticWarningSign SignColumn
+highlight link SyntasticStyleErrorSign SignColumn
+highlight link SyntasticStyleWarningSign SignColumn
 
 let g:jsx_ext_required = 0
+
+let g:fixmyjs_engine = 'eslint'
+noremap <Leader><Leader>f :Fixmyjs<CR>

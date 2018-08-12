@@ -7,7 +7,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'sjl/gundo.vim'
 Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'ggreer/the_silver_searcher'
+Plugin 'mileszs/ack.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'chriskempson/base16-vim'
 Plugin 'losingkeys/vim-niji'
@@ -15,28 +15,40 @@ Plugin 'vim-scripts/paredit.vim'
 Plugin 'jgdavey/tslime.vim'
 Plugin 'xuhdev/vim-latex-live-preview'
 Plugin 'vim-latex/vim-latex'
-Plugin 'scrooloose/syntastic'
+"Plugin 'scrooloose/syntastic'
+Plugin 'w0rp/ale'
+"Plugin 'vim-airline/vim-airline'
 Plugin 'moll/vim-node'
 Plugin 'pangloss/vim-javascript'
 Plugin 'tpope/vim-sensible'
 Plugin 'elzr/vim-json'
-Plugin 'Valloric/YouCompleteMe'
 Plugin 'mxw/vim-jsx'
 Plugin 'millermedeiros/vim-esformatter'
 Bundle 'ruanyl/vim-fixmyjs'
 call vundle#end()            " required
 
+"set rtp+=~/.vim/bundle/YouCompleteMe
 syntax on
 filetype plugin indent on    " indent file based on type
 
-set shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+set background=dark
+colorscheme base16-bright
+
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
+
+if has("termguicolors")
+    set termguicolors
+endif
+
+set shiftwidth=2 tabstop=2 softtabstop=2
+set expandtab
 set number
 set showcmd     
 
-let base16colorspace=256
-colorscheme base16-bright
-set background=dark
-set wildmenu " autocomplete menu in gutter
+"set wildmenu " autocomplete menu in gutter
 set lazyredraw " reduce visual noise and speed up macros
 set showmatch " brace match anim
 
@@ -126,29 +138,40 @@ nmap <C-c><C-c> <Plug>NormalModeSendToTmux
 nmap <C-c>r <Plug>SetTmuxVars
 let g:tslime_ensure_trailing_newlines = 1
 
+"#let g:syntastic_python_pylint_exe = 'pylint --disable spelling --spelling-dict en_US'
+
 " latex
 let g:livepreview_previewer = 'evince'
 
+function! StrTrim(txt)
+  return substitute(a:txt, '^\n*\s*\(.\{-}\)\n*\s*$', '\1', '')
+endfunction
 
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
-
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_loc_list_height = 5
-let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 1
 let g:syntastic_javascript_checkers = ['eslint']
+
+
+" Fix loclist on vertical split
+function! SyntasticSplitFix()
+  let currwin = winnr()
+  wincmd p
+  if !empty(getloclist(0))
+    lclose
+    lopen
+  endif
+  execute currwin . 'wincmd w'
+endfunction
+
+cabbrev vs vs\|call SyntasticSplitFix()
+" You might want to call it also on other commands applying a split
+cabbrev Gdiff Gdiff\|call SyntasticSplitFix()
+"au VimEnter *.js au BufWritePost *.js checktime
 
 let g:syntastic_error_symbol = '❌'
 let g:syntastic_style_error_symbol = '⁉️'
@@ -164,3 +187,10 @@ let g:jsx_ext_required = 0
 
 let g:fixmyjs_engine = 'eslint'
 noremap <Leader><Leader>f :Fixmyjs<CR>
+
+let g:ale_fixers = {
+\   'javascript': ['eslint'],
+\}
+
+let g:airline#extensions#ale#enabled = 1
+
